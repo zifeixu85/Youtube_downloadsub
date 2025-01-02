@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Shorts字幕下载工具</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --secondary-color: #282828;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --border-color: #e9ecef;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .app-title {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .app-description {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .search-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .input-group {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            border-right: none;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #e60000 !important;  /* 更深的红色 */
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+
+        .table-card {
+            margin-top: 1.5rem;
+        }
+
+        .table-card .card-header {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table th {
+            font-weight: 600;
+            color: #666;
+            background: white;
+            border-bottom: 2px solid var(--border-color);
+            padding: 8px 24px;
+        }
+
+        .table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+        }
+
+        .video-title-cell {
+            padding: 1rem 1.5rem !important;  /* 恢复正常padding */
+        }
+
+        .video-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline;  /* 改为inline，只包裹文字 */
+            transition: color 0.2s ease;
+        }
+
+        .video-link:hover {
+            color: var(--primary-color);
+        }
+
+        .form-check-input {
+            margin-top: 0;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .view-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            .app-title {
+                font-size: 1.8rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group > * {
+                width: 100% !important;
+                border-radius: 8px !important;
+                margin: 0.25rem 0;
+            }
+
+            .form-control {
+                border: 1px solid var(--border-color);
+            }
+
+            .table td, .table th {
+                padding: 0.75rem 1rem;
+            }
+
+            .video-link {
+                padding: 0.75rem 1rem;  /* 移动端padding */
+            }
+
+            .video-title-cell,
+            .table td,
+            .table td.text-end {
+                padding: 0.75rem 1rem !important;
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: none;  /* 默认隐藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 300px;
+            max-width: 90%;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            margin: 1rem 0;
+            background-color: var(--border-color);
+        }
+
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+
+        /* 添加淡入淡出效果 */
+        .loading-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            display: flex;
+        }
+
+        /* 修改按钮hover效果 */
+        .btn-primary:hover {
+            background-color: #e60000;  /* 更深的红色 */
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255,0,0,0.2);
+        }
+
+        /* 优化表格列宽 */
+        @media (min-width: 992px) {
+            .container {
+                max-width: 1200px;  /* 更宽的容器 */
+            }
+
+            .table th.check-column,
+            .table td.check-column {
+                width: 80px;  /* 更宽的选择列 */
+            }
+
+            .table th.views-column,
+            .table td.views-column {
+                width: 180px;  /* 更宽的观看次数列 */
+            }
+        }
+
+        .table td.text-end {
+            padding-right: 1.5rem !important;  /* 确保右对齐单元格的padding一致 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1 class="app-title">YouTube Shorts字幕下载工具</h1>
+            <p class="app-description">轻松获取并下载YouTube Shorts视频的字幕文件</p>
+        </div>
+
+        {% if not ffmpeg_installed %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            未检测到ffmpeg。为获得最佳下载效果，建议
+            <a href="https://ffmpeg.org/download.html" target="_blank" class="alert-link">安装ffmpeg</a>
+        </div>
+        {% endif %}
+
+        <div class="card search-card">
+            <div class="card-body">
+                <div class="input-group">
+                    <input type="text" id="channelUrl" class="form-control" 
+                           placeholder="请输入YouTube频道URL（例如：https://www.youtube.com/@channelname）">
+                    <button class="btn btn-primary" onclick="getVideos()">
+                        <i class="bi bi-search me-2"></i>获取Shorts列表
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card table-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAll" onclick="toggleAll()">
+                        <label class="form-check-label" for="selectAll">全选</label>
+                    </div>
+                    <button class="btn btn-success" onclick="downloadSelected()">
+                        <i class="bi bi-download me-2"></i>下载所选字幕
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="videoTable" class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center check-column">选择</th>
+                            <th>视频标题</th>
+                            <th class="text-end views-column">观看次数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videoList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5 class="mt-3">正在处理，请稍候...</h5>
+        </div>
+    </div>
+
+    <div id="progressContainer" class="loading-overlay">
+        <div class="loading-content">
+            <h5 id="progressText">准备下载...</h5>
+            <div class="progress">
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'flex';
+            // 强制重绘
+            loading.offsetHeight;
+            loading.classList.add('show');
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            loading.classList.remove('show');
+            // 等待过渡效果完成后隐藏
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 300);
+        }
+
+        function getVideos() {
+            const channelUrl = document.getElementById('channelUrl').value;
+            
+            if (!channelUrl) {
+                alert('请输入YouTube频道URL');
+                return;
+            }
+
+            showLoading();
+            
+            fetch('/get_videos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `channel_url=${encodeURIComponent(channelUrl)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    displayVideos(data.videos);
+                } else {
+                    alert('获取视频列表失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                alert('发生错误: ' + error);
+            });
+        }
+
+        function formatYouTubeDate(dateStr) {
+            if (!dateStr || dateStr === '19700101') return '未知日期';
+            // 将YYYYMMDD转换为YYYY-MM-DD
+            const year = dateStr.substring(0, 4);
+            const month = dateStr.substring(4, 6);
+            const day = dateStr.substring(6, 8);
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatViewCount(count) {
+            if (count >= 100000000) {
+                return `${(count / 100000000).toFixed(1)}亿次观看`;
+            } else if (count >= 10000) {
+                return `${(count / 10000).toFixed(1)}万次观看`;
+            } else {
+                return `${count.toLocaleString()}次观看`;
+            }
+        }
+
+        function displayVideos(videos) {
+            const tbody = document.getElementById('videoList');
+            tbody.innerHTML = '';
+            
+            for (const video of videos) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input video-select" value="${video.id}">
+                        </div>
+                    </td>
+                    <td class="video-title-cell">
+                        <a href="https://www.youtube.com/watch?v=${video.id}" 
+                           class="video-link" 
+                           target="_blank" 
+                           rel="noopener noreferrer">
+                            ${video.title}
+                        </a>
+                    </td>
+                    <td class="text-end text-muted">${formatViewCount(video.view_count)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.getElementsByClassName('video-select');
+            Array.from(checkboxes).forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        function showProgress() {
+            const progress = document.getElementById('progressContainer');
+            progress.style.display = 'flex';
+            // 强制重绘
+            progress.offsetHeight;
+            progress.classList.add('show');
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').textContent = '准备下载...';
+        }
+
+        function hideProgress() {
+            const progress = document.getElementById('progressContainer');
+            progress.classList.remove('show');
+            // 等待过渡效果完成后隐藏
+            setTimeout(() => {
+                progress.style.display = 'none';
+            }, 300);
+        }
+
+        function updateProgress(current, total, message) {
+            const percentage = (current / total * 100).toFixed(1);
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = message;
+        }
+
+        function downloadSelected() {
+            const checkboxes = document.getElementsByClassName('video-select');
+            const selectedVideos = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (selectedVideos.length === 0) {
+                alert('请选择要下载字幕的视频');
+                return;
+            }
+
+            showLoading();
+            showProgress();
+            
+            // 创建EventSource连接
+            const eventSource = new EventSource('/download_progress');
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                updateProgress(data.current, data.total, data.message);
+            };
+            
+            eventSource.onerror = function() {
+                eventSource.close();
+                hideLoading();
+                hideProgress();
+                alert('下载进度监控失败，但下载可能仍在继续');
+            };
+
+            // 设置较长的超时时间
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 300000); // 5分钟超时
+
+            fetch('/download_subtitles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    videos: selectedVideos
+                }),
+                signal: controller.signal
+            })
+            .then(response => {
+                clearTimeout(timeout);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                hideProgress();
+                eventSource.close();
+                
+                if (data.success) {
+                    window.location.href = '/download_zip';
+                    setTimeout(() => {
+                        alert('字幕下载完成！');
+                    }, 1000);
+                } else {
+                    alert('下载失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                clearTimeout(timeout);
+                hideLoading();
+                hideProgress();
+                eventSource.close();
+                console.error('Download error:', error);
+                alert('下载过程中发生错误，请重试\n' + error.message);
+            });
+        }
+    </script>
+</body>
+</html>
