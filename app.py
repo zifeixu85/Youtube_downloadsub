@@ -1,9 +1,7 @@
-from flask import Flask, render_template, request, jsonify, send_file, Response, g
+from flask import Flask, render_template, request, jsonify, send_file, Response
 from yt_dlp import YoutubeDL
 import os
-import shutil
 from pathlib import Path
-import browser_cookie3
 import queue
 import json
 import zipfile
@@ -12,7 +10,6 @@ import re
 from datetime import datetime
 
 app = Flask(__name__)
-# 使用环境变量或生成随机密钥
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
 
 # 创建一个队列用于存储进度信息
