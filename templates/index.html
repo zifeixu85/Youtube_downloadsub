@@ -373,9 +373,15 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `channel_url=${encodeURIComponent(channelUrl)}`
+                body: `channel_url=${encodeURIComponent(channelUrl)}`,
+                timeout: 30000  // 30秒超时
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 hideLoading();
                 if (data.success) {
@@ -386,7 +392,11 @@
             })
             .catch(error => {
                 hideLoading();
-                alert('发生错误: ' + error);
+                if (error.name === 'TimeoutError') {
+                    alert('请求超时，请稍后重试');
+                } else {
+                    alert('发生错误: ' + error.message);
+                }
             });
         }
 

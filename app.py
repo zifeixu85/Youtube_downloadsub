@@ -25,13 +25,14 @@ def get_channel_videos(channel_url):
         ydl_opts = {
             'quiet': True,
             'extract_flat': True,
-            'playlistend': 100,
+            'playlistend': 50,
             'ignoreerrors': True,
             'no_warnings': True,
-            'sleep_interval': 1,
-            'max_sleep_interval': 5,
-            'sleep_interval_requests': 2,
-            'extractor_retries': 3,
+            'sleep_interval': 0,
+            'max_sleep_interval': 1,
+            'sleep_interval_requests': 1,
+            'extractor_retries': 2,
+            'socket_timeout': 10,
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept-Language': 'en-US,en;q=0.9',
@@ -294,6 +295,20 @@ def download_zip():
             'success': False,
             'error': '创建下载文件失败'
         })
+
+@app.errorhandler(504)
+def gateway_timeout(error):
+    return jsonify({
+        'success': False,
+        'error': '请求超时，请稍后重试'
+    }), 504
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({
+        'success': False,
+        'error': '服务器内部错误，请稍后重试'
+    }), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
