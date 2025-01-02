@@ -28,17 +28,20 @@ def get_channel_videos(channel_url):
         ydl_opts = {
             'quiet': True,
             'extract_flat': True,
-            'cookiesfrombrowser': ('chrome',),  # 恢复 cookies
             'playlistend': 100,
             'ignoreerrors': True,
             'no_warnings': True,
-            # 添加更多选项来避免限制
-            'sleep_interval': 1,  # 请求间隔
+            'sleep_interval': 1,
             'max_sleep_interval': 5,
             'sleep_interval_requests': 2,
             'extractor_retries': 3,
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': '1',
+                'Connection': 'keep-alive'
             }
         }
         
@@ -214,14 +217,17 @@ def download_subtitles():
                     'subtitleslangs': ['en'],
                     'skip_download': True,
                     'outtmpl': str(temp_dir / '%(title)s'),
-                    'cookiesfrombrowser': ('chrome',),  # 恢复 cookies
-                    # 添加更多选项来避免限制
                     'sleep_interval': 1,
                     'max_sleep_interval': 5,
                     'sleep_interval_requests': 2,
                     'extractor_retries': 3,
                     'http_headers': {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'DNT': '1',
+                        'Connection': 'keep-alive'
                     }
                 }
 

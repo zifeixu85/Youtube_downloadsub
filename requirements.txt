@@ -1,3 +1,2 @@
 Flask>=3.0.0
-yt-dlp[cookies]>=2023.12.30
-browser-cookie3>=0.19.1 
+yt-dlp>=2023.12.30 
