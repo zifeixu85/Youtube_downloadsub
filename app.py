@@ -84,9 +84,11 @@ def index():
 @app.route('/get_videos', methods=['POST'])
 def get_videos():
     channel_url = request.form.get('channel_url')
+    print(f"Received request for channel: {channel_url}")
     
     try:
         if '/channel/' not in channel_url and '/c/' not in channel_url and '/user/' not in channel_url and '@' not in channel_url:
+            print(f"Invalid channel URL format: {channel_url}")
             return jsonify({
                 'success': False,
                 'error': '请输入有效的YouTube频道URL'
@@ -94,24 +96,27 @@ def get_videos():
 
         videos, error = get_channel_videos(channel_url)
         if error:
+            print(f"Error getting videos: {error}")
             return jsonify({
                 'success': False,
                 'error': error
             })
             
         if not videos:
+            print("No shorts videos found")
             return jsonify({
                 'success': False,
                 'error': '未找到任何shorts视频'
             })
             
+        print(f"Successfully found {len(videos)} videos")
         return jsonify({
             'success': True,
             'videos': videos
         })
             
     except Exception as e:
-        print(f"Error in get_videos: {str(e)}")
+        print(f"Unexpected error in get_videos: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
