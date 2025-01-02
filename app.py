@@ -19,7 +19,8 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
 progress_queue = queue.Queue()
 
 def check_ffmpeg():
-    return shutil.which('ffmpeg') is not None
+    # 在 Vercel 环境中总是返回 True
+    return True
 
 def get_channel_videos(channel_url):
     """使用yt-dlp获取频道视频列表"""
@@ -69,7 +70,8 @@ def get_channel_videos(channel_url):
 
 @app.route('/')
 def index():
-    return render_template('index.html', ffmpeg_installed=check_ffmpeg())
+    # 移除 ffmpeg 检查
+    return render_template('index.html')
 
 # 使用g对象存储channel信息，避免使用session
 def get_channel_name():
