@@ -81,15 +81,6 @@ def index():
     # 移除 ffmpeg 检查
     return render_template('index.html')
 
-# 使用g对象存储channel信息，避免使用session
-def get_channel_name():
-    if not hasattr(g, 'channel_name'):
-        g.channel_name = 'unknown'
-    return g.channel_name
-
-def set_channel_name(name):
-    g.channel_name = name
-
 @app.route('/get_videos', methods=['POST'])
 def get_videos():
     channel_url = request.form.get('channel_url')
@@ -100,14 +91,6 @@ def get_videos():
                 'success': False,
                 'error': '请输入有效的YouTube频道URL'
             })
-
-        # 提取channel名称
-        channel_name = channel_url.split('/')[-1]
-        if channel_name.startswith('@'):
-            channel_name = channel_name[1:]  # 移除@符号
-        
-        # 保存channel名称
-        set_channel_name(channel_name)
 
         videos, error = get_channel_videos(channel_url)
         if error:
@@ -188,7 +171,7 @@ def download_subtitles():
                 'error': '未选择任何视频'
             })
 
-        temp_dir = Path('temp_subtitles')
+        temp_dir = Path('/tmp/temp_subtitles')
         if temp_dir.exists():
             for file in temp_dir.glob('*'):
                 file.unlink()
